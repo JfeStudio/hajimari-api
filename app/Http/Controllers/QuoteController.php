@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\QuoteRequest;
 use App\Http\Resources\QuoteResource;
 use App\Models\Quote;
 use Illuminate\Http\RedirectResponse;
@@ -15,8 +16,9 @@ class QuoteController extends Controller
      */
     public function index()
     {
-        $data = Quote::get();
-        return response()->json($data);
+        // $data = Quote::all();
+        // return response()->json($data);
+        return QuoteResource::collection(Quote::paginate(5));
     }
 
     /**
@@ -30,9 +32,16 @@ class QuoteController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(QuoteRequest $request)
     {
-        //
+
+        $data = Quote::create($request->all());
+        return new QuoteResource($data);
+        // OR
+        // if ($validated) :
+            // $data = Quote::create($validated);
+            // return new QuoteResource($data);
+        // endif;
     }
 
     /**
