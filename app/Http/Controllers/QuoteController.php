@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\QuoteRequest;
+use App\Http\Requests\UpdateQuoteRequest;
 use App\Http\Resources\QuoteResource;
 use App\Models\Quote;
 use Illuminate\Http\RedirectResponse;
@@ -35,7 +36,7 @@ class QuoteController extends Controller
     public function store(QuoteRequest $request)
     {
 
-        $data = Quote::create($request->all());
+        $data = Quote::create($request->validated());
         return new QuoteResource($data);
         // OR
         // if ($validated) :
@@ -69,9 +70,15 @@ class QuoteController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Quote $quote)
+    public function update(UpdateQuoteRequest $request, Quote $quote)
     {
-        //
+        // 1st pake ($id)
+        // $data = $request->all();
+        // Quote::where('id', $id)->update($data);
+        // return response()->json($data, 200);
+
+        // 2nd pake model binding ($quote) + resource
+        return new QuoteResource(tap($quote)->update($request->validated()));
     }
 
     /**
@@ -79,6 +86,18 @@ class QuoteController extends Controller
      */
     public function destroy(Quote $quote)
     {
-        //
+        // 1st by $id
+        // $quote = Quote::find($id);
+        // if ($quote) {
+        //     $quote->delete();
+        //     return response()->json(['message' => 'success!']);
+        // } else {
+        //     return response()->json(['message' => 'error!']);
+        // }
+
+        // 2nd by model binding ($quote)
+        $quote->delete();
+        return response()->json(["message" => "success!"]);
+        // return response()->noContent(); / null
     }
 }
