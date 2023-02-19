@@ -7,28 +7,28 @@ use App\Http\Requests\LoginRequest;
 use App\Http\Resources\LoginResource;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class ApiAuthController extends Controller
 {
     public function login(LoginRequest $request){
-        // check user yg login siapa?
-        $user = User::where('email', $request->email)->first();
-        // lalu check klw bukan user dengan pass yg tidak sama dengan di inputkannya dgn pass yg di db maka.
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            // kita return 401
-            return response()->json([
-                'message' => 'Bad Credentials',
-            ], 401);
+        // check user yg login siapa? menggunakan only()
+        $creadentials = $request->only('email', 'password');
+        // check menggunakan auth attemp punya laravel, dia akan mengembalikan true/false
+        if (Auth::attempt($creadentials)) {
+            // lalu kita cari user
+            $user = User::where('email', $request->email)->first();
+            // dan generate token
+            $token = $user->createToken('token')->plainTextToken;
+            // kita return datanya menggunakan resource
+                return new LoginResource([
+                    'message' => 'success',
+                    'user' => $user,
+                    'token' => $token,
+                ]);
         }
-        // return $user->createToken('token')->plainTextToken;
-        // klw success kita generate token
-        $token = $user->createToken('token')->plainTextToken;
-        // dan return responnnya
-        return new LoginResource([
-            'message' => 'success',
-            'user' => $user,
-            'token' => $token,
-        ]);
+        // klw pass gagal, maka dia akan return di bawah ini
+        return response()->json(['message' => 'Bad Credentials']);
     }
 }
