@@ -19,7 +19,9 @@ class QuoteController extends Controller
     {
         // $data = Quote::all();
         // return response()->json($data);
-        return QuoteResource::collection(Quote::paginate(5));
+        return QuoteResource::collection(Quote::all());
+        // paginate
+        // return QuoteResource::collection(Quote::paginate(5));
     }
 
     /**
@@ -35,7 +37,6 @@ class QuoteController extends Controller
      */
     public function store(QuoteRequest $request)
     {
-
         $data = Quote::create($request->validated());
         return new QuoteResource($data);
         // OR
