@@ -31,4 +31,35 @@ class ApiAuthController extends Controller
         // klw pass gagal, maka dia akan return di bawah ini
         return response()->json(['message' => 'Bad Credentials']);
     }
+
+    public function register(Request $request) {
+        $validated = $request->validate([
+            'name' => 'required|string|min:3',
+            'email' => 'required|email|min:3',
+            'password' => 'required|min:8'
+        ]);
+        if ($validated) {
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+            ]);
+            $token = $user->createToken('token')->plainTextToken;
+            return response()->json([
+                'message' => 'success',
+                'user' => $user,
+                'token' => $token,
+            ]);
+        }
+        return response()->json([
+            'message' => 'data bad credentials',
+        ]);
+    }
+
+    public function logout(Request $request) {
+        $request->user()->currentAccessToken()->delete();
+        return response()->json([
+            "message" => 'success',
+        ]);
+    }
 }

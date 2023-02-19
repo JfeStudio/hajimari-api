@@ -17,10 +17,14 @@ class QuoteController extends Controller
      */
     public function index()
     {
-        // $data = Quote::all();
-        // return response()->json($data);
-        return QuoteResource::collection(Quote::all());
-        // paginate
+        $data = Quote::all();
+        return response()->json([
+            'message' => 'success',
+            'data' => $data,
+        ]);
+
+        // paginate pake resource
+        // return QuoteResource::collection(Quote::all());
         // return QuoteResource::collection(Quote::paginate(5));
     }
 
@@ -38,7 +42,14 @@ class QuoteController extends Controller
     public function store(QuoteRequest $request)
     {
         $data = Quote::create($request->validated());
-        return new QuoteResource($data);
+        return response()->json([
+            'message' => 'success',
+            'data' => $data,
+        ]);
+
+        // pake resource
+        // $data = Quote::create($request->validated());
+        // return new QuoteResource($data);
         // OR
         // if ($validated) :
             // $data = Quote::create($validated);
@@ -52,7 +63,10 @@ class QuoteController extends Controller
     public function show(Quote $quote)
     {
         // $data = Quote::where('id', $id)->first();
-        return new QuoteResource($quote);
+        return response()->json([
+            'message' => 'success',
+            'data' => $quote,
+        ]);
         // if ($quote) {
         //     return response()->json($quote);
         // } else {
@@ -73,13 +87,13 @@ class QuoteController extends Controller
      */
     public function update(UpdateQuoteRequest $request, Quote $quote)
     {
-        // 1st pake ($id)
-        // $data = $request->all();
-        // Quote::where('id', $id)->update($data);
-        // return response()->json($data, 200);
+        // 1st
+        $data = $request->all();
+        Quote::where('id', $quote->id)->update($data);
+        return response()->json($data, 200);
 
         // 2nd pake model binding ($quote) + resource
-        return new QuoteResource(tap($quote)->update($request->validated()));
+        // return new QuoteResource(tap($quote)->update($request->validated()));
     }
 
     /**
