@@ -87,10 +87,9 @@ class QuoteController extends Controller
      */
     public function update(UpdateQuoteRequest $request, Quote $quote)
     {
-        // 1st
-        $data = $request->all();
-        Quote::where('id', $quote->id)->update($data);
-        return response()->json($data, 200);
+        // 1st model binding
+        $quote->update($request->all());
+        return new QuoteResource($quote);
 
         // 2nd pake model binding ($quote) + resource
         // return new QuoteResource(tap($quote)->update($request->validated()));

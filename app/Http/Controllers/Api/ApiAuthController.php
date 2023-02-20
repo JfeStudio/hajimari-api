@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
+use App\Http\Requests\RegisterRequest;
 use App\Http\Resources\LoginResource;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -32,28 +33,21 @@ class ApiAuthController extends Controller
         return response()->json(['message' => 'Bad Credentials']);
     }
 
-    public function register(Request $request) {
-        $validated = $request->validate([
-            'name' => 'required|string|min:3',
-            'email' => 'required|email|min:3',
-            'password' => 'required|min:8'
+    public function register(RegisterRequest $request) {
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
         ]);
-        if ($validated) {
-            $user = User::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
-            ]);
-            $token = $user->createToken('token')->plainTextToken;
-            return response()->json([
-                'message' => 'success',
-                'user' => $user,
-                'token' => $token,
-            ]);
-        }
+        $token = $user->createToken('token')->plainTextToken;
         return response()->json([
-            'message' => 'data bad credentials',
-        ]);
+                    'message' => 'success',
+                    'user' => $user,
+                    'token' => $token,
+            ]);
+        // return response()->json([
+        //     'message' => 'data bad credentials',
+        // ]);
     }
 
     public function logout(Request $request) {
